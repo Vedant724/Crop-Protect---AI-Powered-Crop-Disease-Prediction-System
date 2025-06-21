@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🌿 CropProtect - Crop Disease Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #43a047;
+      --dark-green: #2e7d32;
+      --light-green: #e8f5e9;
+      --blue: #1565c0;
+      --hover-blue: #0d47a1;
+      --bg-light: #f2f7f5;
+      --bg-dark: #1e1e1e;
+      --text-light: #000;
+      --text-dark: #fff;
+    }
+
+    * {
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      margin: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* NAVIGATION */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: background 0.4s;
+    }
+
+    body.dark-mode nav {
+      background: #2c2c2c;
+    }
+
+    .nav-logo {
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--dark-green);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-weight: 500;
+      color: inherit;
+      transition: color 0.2s;
+      padding-bottom: 3px;
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--dark-green);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .dark-toggle-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      margin-left: 10px;
+      color: var(--blue);
+      transition: transform 0.2s;
+    }
+
+    .dark-toggle-btn:hover {
+      transform: scale(1.2);
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      width: 95%;
+      max-width: 720px;
+      margin: 50px auto;
+      background: white;
+      padding: 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      transition: background 0.3s;
+    }
+
+    body.dark-mode .container {
+      background: #2c2c2c;
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--dark-green);
+      margin-bottom: 35px;
+      font-weight: 700;
+    }
+
+    label {
+      display: block;
+      margin-top: 20px;
+      font-weight: 500;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    input[type="file"] {
+      padding: 8px;
+      background: #f9f9f9;
+    }
+
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      font-size: 16px;
+      margin-top: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #388e3c;
+    }
+
+    .image-preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .image-preview-container img {
+      max-width: 48%;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .results {
+      margin-top: 40px;
+      padding: 25px;
+      background: var(--light-green);
+      border-left: 6px solid var(--dark-green);
+      border-radius: 14px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .results h3 {
+      margin: 14px 0 6px;
+      color: var(--dark-green);
+    }
+
+    .results img {
+      margin-top: 20px;
+      max-width: 100%;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .report-btn {
+      background-color: var(--blue);
+      margin-top: 20px;
+    }
+
+    .report-btn:hover {
+      background-color: var(--hover-blue);
+    }
+
+    .spinner {
+      margin: 20px auto;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #c8e6c9;
+      border-top: 4px solid var(--dark-green);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 650px) {
+      nav {
+        flex-direction: column;
+        gap: 8px;
+        padding: 12px;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .image-preview-container img {
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-logo">🌾 CropProtect</div>
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#predict">Predict</a>
+      <button class="dark-toggle-btn" onclick="toggleDarkMode()">🌙</button>
+    </div>
+  </nav>
+
+  <div class="container" id="home">
+    <h1>🌾 CropProtect - Disease Predictor</h1>
+    <form action="/" method="POST" enctype="multipart/form-data" onsubmit="showSpinner()" id="predict">
+      <label>📤 Upload Plant Images:</label>
+      <input type="file" name="file" accept="image/*" required onchange="previewImages(event)">
+      <div class="image-preview-container" id="imagePreviewContainer"></div>
+
+      <label>📱 Your Phone Number:</label>
+      <input type="text" name="phone" placeholder="+91XXXXXXXXXX" required>
+
+      <label>🌐 Preferred Language:</label>
+      <select name="language" required>
+        <option value="en">🇬🇧 English</option>
+        <option value="hi">🇮🇳 Hindi</option>
+        <option value="te">🇮🇳 Telugu</option>
+        <option value="ta">🇮🇳 Tamil</option>
+        <option value="kn">🇮🇳 Kannada</option>
+      </select>
+
+      <button type="submit">🔍 Predict & Notify</button>
+      <div id="spinner" class="spinner" style="display: none;"></div>
+    </form>
+
+    {% if label %}
+    <div class="results">
+      <h3>🔍 Predicted Disease (English):</h3>
+      <p>{{ label }}</p>
+
+      <h3>💊 Suggestion (English):</h3>
+      <p>{{ suggestion }}</p>
+
+      <h3>🌐 Translated Disease:</h3>
+      <p>{{ translated_label }}</p>
+
+      <h3>🌱 Translated Suggestion:</h3>
+      <p>{{ translated_suggestion }}</p>
+
+      {% if highlighted_image_path %}
+      <img src="{{ url_for('static', filename=highlighted_image_path) }}" alt="Highlighted Image">
+      {% endif %}
+
+      <form action="/generate_report" method="POST">
+        <input type="hidden" name="label" value="{{ label }}">
+        <input type="hidden" name="suggestion" value="{{ suggestion }}">
+        <input type="hidden" name="translated_label" value="{{ translated_label }}">
+        <input type="hidden" name="translated_suggestion" value="{{ translated_suggestion }}">
+        <input type="hidden" name="file_path" value="{{ file_path }}">
+        <button class="report-btn" type="submit">📄 Generate Report</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="container" id="about">
+    <h2>📘 About</h2>
+    <p>CropProtect uses AI to detect plant diseases from leaf images and provides helpful treatment suggestions in your local language.</p>
+  </div>
+
+  <div class="container" id="contact">
+    <h2>📞 Contact Us</h2>
+    <p>Email: support@CropProtect.ai</p>
+    <p>Phone: +91 98765 43210</p>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      const body = document.body;
+      const btn = document.querySelector('.dark-toggle-btn');
+      body.classList.toggle("dark-mode");
+      btn.textContent = body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    }
+
+    function previewImages(event) {
+      const container = document.getElementById('imagePreviewContainer');
+      container.innerHTML = '';
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          container.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function showSpinner() {
+      document.getElementById('spinner').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
